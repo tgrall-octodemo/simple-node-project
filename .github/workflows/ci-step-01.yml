@@ -12,7 +12,22 @@ on:
     branches: [ main ]
 
 jobs:
+
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: A job to say hello
+    steps:
+    - name: Hello world action step
+      id: hello
+      uses: tgrall-octodemo/simple-tug-action@main
+      with:
+        who-to-greet: 'Mona the Octocat'
+    # Use the output from the `hello` step
+    - name: Get the output time
+      run: echo "The time was ${{ steps.hello.outputs.time }}"
+
   build:
+    needs: hello_world_job  
     name: "Build and Test 🚧:"
     runs-on: ubuntu-latest
 
@@ -30,15 +45,3 @@ jobs:
     - run: npm run build --if-present
     - run: npm test
 
-  hello_world_job:
-    runs-on: ubuntu-latest
-    name: A job to say hello
-    steps:
-    - name: Hello world action step
-      id: hello
-      uses: tgrall-octodemo/simple-tug-action@main
-      with:
-        who-to-greet: 'Mona the Octocat'
-    # Use the output from the `hello` step
-    - name: Get the output time
-      run: echo "The time was ${{ steps.hello.outputs.time }}"
