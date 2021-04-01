@@ -102,24 +102,24 @@ deploy-prod:
         run: echo " PROD PROD PROD !!!! ${{ steps.hello.outputs.time }} -- branch is ${GITHUB_REF#refs/heads/} }  "      
 
 
-    steps:
-    - name: Get the repo
-      uses: actions/checkout@v2
+      steps:
+      - name: Get the repo
+        uses: actions/checkout@v2
 
-    - name: Load the environment
-      uses: xom9ikk/dotenv@v1
-      with:
-        mode: ${{ matrix.env.name }}
+      - name: Load the environment
+        uses: xom9ikk/dotenv@v1
+        with:
+          mode: ${{ matrix.env.name }}
 
-    - name: Say something nice
-      run: |
-        echo "::group::My messages in a group"
-        echo "Hello ${{ env.MSG }} from $${github.event.inputs.name}}. -- branch is ${GITHUB_REF#refs/heads/} "
-        echo "::endgroup::"
-    - name: Share something nice
-      id: share
-      run: |
-        echo "::set-output name=${{ matrix.env.name }}_message::${{ env.MSG }}"
+      - name: Say something nice
+        run: |
+          echo "::group::My messages in a group"
+          echo "Hello ${{ env.MSG }} from $${github.event.inputs.name}}. -- branch is ${GITHUB_REF#refs/heads/} "
+          echo "::endgroup::"
+      - name: Share something nice
+        id: share
+        run: |
+          echo "::set-output name=${{ matrix.env.name }}_message::${{ env.MSG }}"
 
 
   goodbye:
