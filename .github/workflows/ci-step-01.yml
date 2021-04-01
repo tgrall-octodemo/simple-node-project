@@ -55,6 +55,37 @@ jobs:
       production_message: ${{ steps.share.outputs.production_message }}
       development_message: ${{ steps.share.outputs.development_message }}
       staging_message: ${{ steps.share.outputs.staging_message }}
+    strategy:
+      fail-fast: true
+      matrix: 
+        env: [
+          { name: 'development' },
+          { name: 'staging' },
+          { name: 'production' }
+        ]
+    
+    environment: 
+      name: ${{ matrix.env.name }}
+      
+    steps:
+    - name: Get the repo
+      uses: actions/checkout@v2
+
+    - name: Load the environment
+      uses: xom9ikk/dotenv@v1
+      with:
+        mode: ${{ matrix.env.name }}
+
+    - name: Say something nice
+      run: |
+        echo "::group::My messages in a group"
+        echo "Hello ${{ env.MSG }} from $${github.event.inputs.name}}."
+        echo "::endgroup::"
+    - name: Share something nice
+      id: share
+      run: |
+        echo "::set-output name=${{ matrix.env.name }}_message::${{ env.MSG }}"
+
 
 
   goodbye:
