@@ -92,7 +92,7 @@ jobs:
     name: "Bye 🖖"
     runs-on: ubuntu-latest
     needs: 
-      - build
+      - deploy
     
     steps:
     - name: Retrieve something nice
