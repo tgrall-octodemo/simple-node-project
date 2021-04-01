@@ -132,6 +132,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: 
       - deploy-tug
+      - deploy-test
     
     steps:
     - name: Retrieve something nice
