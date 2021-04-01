@@ -86,7 +86,7 @@ jobs:
         echo "::set-output name=${{ matrix.env.name }}_message::${{ env.MSG }}"
 
 
-  deploy-test:
+  deploy-tug:
     if: ${{ github.ref == 'refs/heads/main' }}
     name: "Deploy 🚀 in test and staging"
     runs-on: ubuntu-latest
