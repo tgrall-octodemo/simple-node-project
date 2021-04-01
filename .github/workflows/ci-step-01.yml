@@ -24,7 +24,7 @@ jobs:
         who-to-greet: 'Mona the Octocat'
     # Use the output from the `hello` step
     - name: Get the output time
-      run: echo "The time was ${{ steps.hello.outputs.time }} -- branch is ${{ ${GITHUB_REF#refs/heads/} }}  "
+      run: echo "The time was ${{ steps.hello.outputs.time }} -- branch is ${GITHUB_REF#refs/heads/} }  "
 
   build:
     needs: hello_world_job  
@@ -79,7 +79,7 @@ jobs:
     - name: Say something nice
       run: |
         echo "::group::My messages in a group"
-        echo "Hello ${{ env.MSG }} from $${github.event.inputs.name}}. -- branch is ${{ ${GITHUB_REF#refs/heads/} }} "
+        echo "Hello ${{ env.MSG }} from $${github.event.inputs.name}}. -- branch is ${GITHUB_REF#refs/heads/} "
         echo "::endgroup::"
     - name: Share something nice
       id: share
@@ -97,7 +97,7 @@ jobs:
     steps:
     - name: Retrieve something nice
       run: |
-        echo "::warning ::${{ needs.deploy.outputs.production_message }} -- branch is ${{ ${GITHUB_REF#refs/heads/} }} "
+        echo "::warning ::${{ needs.deploy.outputs.production_message }} -- branch is ${GITHUB_REF#refs/heads/} "
     
     - name: Trigger something
       uses: actions/github-script@v3
@@ -110,7 +110,7 @@ jobs:
               repo: context.repo.repo,
               event_type: 'goodbye',
               client_payload: {
-                message: "${{ needs.deploy.outputs.production_message }} -- branch is ${{ ${GITHUB_REF#refs/heads/} }} " 
+                message: "${{ needs.deploy.outputs.production_message }} -- branch is ${GITHUB_REF#refs/heads/} " 
               }
             }
           )
