@@ -1,0 +1,8 @@
+---
+name: Deploy
+about: To deploy
+title: "[DATE]: [FEATURE NAME]"
+labels: deploy
+---
+
+This issue is used to schedule a deployment
