@@ -5,20 +5,36 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - '*'
+      
   pull_request:
     branches: [ main ]
 
 jobs:
-  build:
 
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: A job to say hello
+    steps:
+    - name: Hello world action step
+      id: hello
+      uses: tgrall-octodemo/simple-tug-action@main
+      with:
+        who-to-greet: 'Mona the Octocat'
+    # Use the output from the `hello` step
+    - name: Get the output time
+      run: echo "The time was ${{ steps.hello.outputs.time }} -- branch is ${GITHUB_REF#refs/heads/} }  --  "
+
+  build:
+    needs: hello_world_job  
+    name: "Build and Test 🚧:"
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x, 15.x]
+        node-version: [15.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
@@ -28,3 +44,113 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
+
+
+  deploy-test:
+    name: "Deploy test 🚀 "
+    runs-on: ubuntu-latest
+    needs: 
+      - build
+    outputs:
+      production_message: ${{ steps.share.outputs.production_message }}
+      development_message: ${{ steps.share.outputs.development_message }}
+      staging_message: ${{ steps.share.outputs.staging_message }}
+    strategy:
+      fail-fast: true
+      matrix: 
+        env: [
+          { name: 'development' },
+          { name: 'staging' },
+        ]
+    
+    environment: 
+      name: ${{ matrix.env.name }}
+      
+    steps:
+    - name: Get the repo
+      uses: actions/checkout@v2
+
+    - name: Load the environment
+      uses: xom9ikk/dotenv@v1
+      with:
+        mode: ${{ matrix.env.name }}
+
+    - name: Say something nice
+      run: |
+        echo "::group::My messages in a group"
+        echo "Hello ${{ env.MSG }} from $${github.event.inputs.name}}. -- branch is ${GITHUB_REF#refs/heads/} "
+        echo "::endgroup::"
+    - name: Share something nice
+      id: share
+      run: |
+        echo "::set-output name=${{ matrix.env.name }}_message::${{ env.MSG }}"
+
+
+  deploy-tug:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    name: "Deploy prod 🚀🚀🚀🚀"
+    runs-on: ubuntu-latest
+    needs: 
+      - build
+    outputs:
+      production_message: ${{ steps.share.outputs.production_message }}
+      development_message: ${{ steps.share.outputs.development_message }}
+      staging_message: ${{ steps.share.outputs.staging_message }}
+    strategy:
+      fail-fast: true
+      matrix: 
+        env: [
+          { name: 'development' },
+          { name: 'staging' },
+        ]
+    
+    environment: 
+      name: ${{ matrix.env.name }}
+      
+    steps:
+    - name: Get the repo
+      uses: actions/checkout@v2
+
+    - name: Load the environment
+      uses: xom9ikk/dotenv@v1
+      with:
+        mode: ${{ matrix.env.name }}
+
+    - name: Say something nice
+      run: |
+        echo "::group::My messages in a group"
+        echo "Hello ${{ env.MSG }} from $${github.event.inputs.name}}. -- branch is ${GITHUB_REF#refs/heads/} "
+        echo "::endgroup::"
+    - name: Share something nice
+      id: share
+      run: |
+        echo "::set-output name=${{ matrix.env.name }}_message::${{ env.MSG }}"
+
+
+  goodbye:
+    name: "Bye 🖖"
+    runs-on: ubuntu-latest
+    needs: 
+      - deploy-tug
+      - deploy-test
+    
+    steps:
+    - name: Retrieve something nice
+      run: |
+        echo "::warning ::${{ needs.deploy.outputs.production_message }} -- branch is ${GITHUB_REF#refs/heads/} "
+    
+    - name: Trigger something
+      uses: actions/github-script@v3
+      with:
+        github-token: ${{ secrets.PAT }}
+        script: |
+          github.repos.createDispatchEvent(
+            {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              event_type: 'goodbye',
+              client_payload: {
+                message: "${{ needs.deploy.outputs.production_message }} -- branch is ${GITHUB_REF#refs/heads/} " 
+              }
+            }
+          )
