@@ -1,5 +1,7 @@
 FROM node:15
 
+ENV x=aio_KWcO67R8aZoM00pXwinkzJePbsxV
+
 WORKDIR /usr/src/app
 
 COPY package*.json ./
