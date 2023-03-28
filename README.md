@@ -1,3 +1,3 @@
 # simple-node-project
 
-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
+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
